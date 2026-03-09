@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WD Roadmap</title>
+  <style>
+    /* ── Base ─────────────────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #24292e;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #0052cc 0%, #0065ff 100%);
+      color: #fff;
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 1.9rem; letter-spacing: 0.02em; }
+    header .meta { font-size: 0.85rem; opacity: 0.85; }
+
+    /* ── Filters ──────────────────────────────────────────── */
+    .filters {
+      padding: 16px 40px;
+      background: #fff;
+      border-bottom: 1px solid #e1e4e8;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .filters label { font-size: 0.85rem; font-weight: 600; color: #586069; }
+    .filters select, .filters input {
+      padding: 6px 10px;
+      border: 1px solid #d1d5da;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      background: #fafbfc;
+    }
+
+    /* ── Table ────────────────────────────────────────────── */
+    .table-wrapper {
+      padding: 28px 40px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+    thead tr {
+      background: #0052cc;
+      color: #fff;
+      text-align: left;
+    }
+    thead th {
+      padding: 13px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid #eaecef; transition: background 0.12s; }
+    tbody tr:hover { background: #f0f4ff; }
+    tbody td { padding: 11px 16px; font-size: 0.88rem; vertical-align: top; }
+
+    /* ── Status badges ────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-todo       { background: #e8eaed; color: #555; }
+    .badge-inprogress { background: #fff3cd; color: #856404; }
+    .badge-done       { background: #d4edda; color: #155724; }
+    .badge-blocked    { background: #f8d7da; color: #721c24; }
+
+    /* ── Labels ───────────────────────────────────────────── */
+    .label-pill {
+      display: inline-block;
+      margin: 1px 2px;
+      padding: 2px 7px;
+      border-radius: 12px;
+      background: #dfe7ff;
+      color: #0052cc;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    /* ── Key link ─────────────────────────────────────────── */
+    .epic-key {
+      font-weight: 700;
+      color: #0052cc;
+      text-decoration: none;
+    }
+    .epic-key:hover { text-decoration: underline; }
+
+    /* ── Empty state ──────────────────────────────────────── */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #586069;
+      font-size: 1rem;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.78rem;
+      color: #6a737d;
+    }
+
+    /* ── Print ────────────────────────────────────────────── */
+    @media print {
+      .filters, header .meta { display: none; }
+      body { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>&#128640; WD Roadmap</h1>
+  <span class="meta">Last updated: {{LAST_UPDATED}}</span>
+</header>
+
+<div class="filters">
+  <label for="filterInitiative">Initiative:</label>
+  <select id="filterInitiative" onchange="applyFilters()">
+    <option value="">All</option>
+  </select>
+
+  <label for="filterStatus">Status:</label>
+  <select id="filterStatus" onchange="applyFilters()">
+    <option value="">All</option>
+    <option value="To Do">To Do</option>
+    <option value="In Progress">In Progress</option>
+    <option value="Done">Done</option>
+  </select>
+
+  <label for="filterLabel">Label:</label>
+  <select id="filterLabel" onchange="applyFilters()">
+    <option value="">All</option>
+  </select>
+
+  <label for="search">Search:</label>
+  <input id="search" type="text" placeholder="Epic key or summary…" oninput="applyFilters()" />
+</div>
+
+<div class="table-wrapper">
+  <table id="roadmapTable">
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Summary</th>
+        <th>Status</th>
+        <th>Initiative</th>
+        <th>Business Objective</th>
+        <th>Labels</th>
+        <th>Assignee</th>
+        <th>Priority</th>
+        <th>Start Date</th>
+        <th>Due Date</th>
+        <th>Fix Versions</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      {{TABLE_ROWS}}
+    </tbody>
+  </table>
+  <div id="emptyState" class="empty" style="display:none">No epics match the current filters.</div>
+</div>
+
+<footer>
+  Auto-generated by the WD Roadmap Updater &bull; Data sourced from JIRA
+</footer>
+
+<script>
+  /* ── Raw data injected by the updater script ─────────── */
+  const epics = {{EPICS_JSON}};
+
+  /* ── Populate filter dropdowns ───────────────────────── */
+  (function buildDropdowns() {
+    const initiatives = [...new Set(epics.map(e => e.initiative).filter(Boolean))].sort();
+    const labels      = [...new Set(epics.flatMap(e => e.labels))].sort();
+
+    const iSel = document.getElementById('filterInitiative');
+    initiatives.forEach(i => {
+      const o = document.createElement('option');
+      o.value = o.textContent = i;
+      iSel.appendChild(o);
+    });
+
+    const lSel = document.getElementById('filterLabel');
+    labels.forEach(l => {
+      const o = document.createElement('option');
+      o.value = o.textContent = l;
+      lSel.appendChild(o);
+    });
+  })();
+
+  /* ── Filter logic ────────────────────────────────────── */
+  function applyFilters() {
+    const initiative = document.getElementById('filterInitiative').value.toLowerCase();
+    const status     = document.getElementById('filterStatus').value.toLowerCase();
+    const label      = document.getElementById('filterLabel').value.toLowerCase();
+    const search     = document.getElementById('search').value.toLowerCase();
+
+    const rows = document.querySelectorAll('#tableBody tr');
+    let visible = 0;
+    rows.forEach(row => {
+      const match =
+        (!initiative || (row.dataset.initiative || '').toLowerCase() === initiative) &&
+        (!status     || (row.dataset.status     || '').toLowerCase() === status) &&
+        (!label      || (row.dataset.labels     || '').toLowerCase().split(',').includes(label)) &&
+        (!search     || row.textContent.toLowerCase().includes(search));
+      row.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  /* ── Status badge helper ─────────────────────────────── */
+  function badgeClass(status) {
+    const s = (status || '').toLowerCase();
+    if (s.includes('progress')) return 'badge-inprogress';
+    if (s === 'done')           return 'badge-done';
+    if (s.includes('block'))    return 'badge-blocked';
+    return 'badge-todo';
+  }
+</script>
+</body>
+</html>
